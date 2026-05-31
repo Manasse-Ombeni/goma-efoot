@@ -209,24 +209,37 @@ def standings(request):
 
 
 def playoffs(request):
-    """Page phase finale."""
-    playoff_matches = PlayoffMatch.objects.all().order_by('round_type')
+    """Page phase finale (Mise à jour pour le TOP 8 / Quarts de finale)."""
+    # On trie par created_at pour garder l'ordre logique de génération des matchs
+    playoff_matches = PlayoffMatch.objects.all().order_by('created_at')
 
+    # Récupération des Quarts de finale
+    quart_1 = playoff_matches.filter(round_type__startswith='quart_1')
+    quart_2 = playoff_matches.filter(round_type__startswith='quart_2')
+    quart_3 = playoff_matches.filter(round_type__startswith='quart_3')
+    quart_4 = playoff_matches.filter(round_type__startswith='quart_4')
+
+    # Récupération des Demi-finales et Finales
     semi_1 = playoff_matches.filter(round_type__startswith='semi_1')
     semi_2 = playoff_matches.filter(round_type__startswith='semi_2')
     third_place = playoff_matches.filter(round_type='third_place').first()
     final = playoff_matches.filter(round_type='final').first()
 
-    top_4 = Standing.objects.all().order_by(
+    # On passe au TOP 8 pour l'affichage des équipes qualifiées
+    top_8 = Standing.objects.all().order_by(
         '-points', '-goal_difference', '-goals_for'
-    )[:4]
+    )[:8]
 
     context = {
+        'quart_1': quart_1,
+        'quart_2': quart_2,
+        'quart_3': quart_3,
+        'quart_4': quart_4,
         'semi_1': semi_1,
         'semi_2': semi_2,
         'third_place': third_place,
         'final': final,
-        'top_4': top_4,
+        'top_8': top_8,
         'has_playoffs': playoff_matches.exists(),
     }
     return render(request, 'league/playoffs/playoffs.html', context)
@@ -565,50 +578,56 @@ def validate_result(request, result_id):
     return redirect('league:admin_dashboard')
 
 
-# --- Phase Finale ---
+# --- Phase Finale (TOP 8) ---
 
 def generate_playoffs(request):
-    """Génère la phase finale avec les 4 premiers du classement."""
+    """Génère la phase finale avec les 8 premiers du classement (Quarts de finale)."""
     if not is_admin(request):
         return redirect('league:login')
 
     if request.method == 'POST':
         PlayoffMatch.objects.all().delete()
 
-        top_4 = Standing.objects.all().order_by(
+        # On prend désormais le TOP 8
+        top_8 = Standing.objects.all().order_by(
             '-points', '-goal_difference', '-goals_for'
-        )[:4]
+        )[:8]
 
-        if top_4.count() < 4:
-            messages.error(request, "Il faut au moins 4 équipes classées.")
+        if top_8.count() < 8:
+            messages.error(request, "Il faut au moins 8 équipes classées.")
             return redirect('league:playoffs')
 
-        teams = [s.team for s in top_4]
+        teams = [s.team for s in top_8]
 
-        PlayoffMatch.objects.create(
-            round_type='semi_1_leg1',
-            home_team=teams[0],
-            away_team=teams[3]
-        )
-        PlayoffMatch.objects.create(
-            round_type='semi_1_leg2',
-            home_team=teams[3],
-            away_team=teams[0]
-        )
-        PlayoffMatch.objects.create(
-            round_type='semi_2_leg1',
-            home_team=teams[1],
-            away_team=teams[2]
-        )
-        PlayoffMatch.objects.create(
-            round_type='semi_2_leg2',
-            home_team=teams[2],
-            away_team=teams[1]
-        )
+        # --- GÉNÉRATION DES QUARTS DE FINALE (Aller-Retour) ---
+        # Match 1 : 1er vs 8e
+        PlayoffMatch.objects.create(round_type='quart_1_leg1', home_team=teams[0], away_team=teams[7])
+        PlayoffMatch.objects.create(round_type='quart_1_leg2', home_team=teams[7], away_team=teams[0])
+
+        # Match 2 : 2e vs 7e
+        PlayoffMatch.objects.create(round_type='quart_2_leg1', home_team=teams[1], away_team=teams[6])
+        PlayoffMatch.objects.create(round_type='quart_2_leg2', home_team=teams[6], away_team=teams[1])
+
+        # Match 3 : 3e vs 6e
+        PlayoffMatch.objects.create(round_type='quart_3_leg1', home_team=teams[2], away_team=teams[5])
+        PlayoffMatch.objects.create(round_type='quart_3_leg2', home_team=teams[5], away_team=teams[2])
+
+        # Match 4 : 4e vs 5e
+        PlayoffMatch.objects.create(round_type='quart_4_leg1', home_team=teams[3], away_team=teams[4])
+        PlayoffMatch.objects.create(round_type='quart_4_leg2', home_team=teams[4], away_team=teams[3])
+
+        # --- PRÉPARATION DES ÉTAPES SUIVANTES (Vides au départ) ---
+        # Demi-finales (Vainqueur Q1 vs Vainqueur Q4  &  Vainqueur Q2 vs Vainqueur Q3)
+        PlayoffMatch.objects.create(round_type='semi_1_leg1')
+        PlayoffMatch.objects.create(round_type='semi_1_leg2')
+        PlayoffMatch.objects.create(round_type='semi_2_leg1')
+        PlayoffMatch.objects.create(round_type='semi_2_leg2')
+
+        # Finales
         PlayoffMatch.objects.create(round_type='third_place')
         PlayoffMatch.objects.create(round_type='final')
 
-        messages.success(request, "Phase finale générée avec succès !")
+        messages.success(request, "Phase finale (TOP 8) générée avec succès !")
         return redirect('league:playoffs')
 
     return redirect('league:playoffs')
@@ -628,6 +647,7 @@ def playoff_result(request, pk):
             match_obj.is_played = True
             match_obj.save()
 
+            # Met à jour la suite du tournoi
             _update_playoff_bracket(match_obj)
 
             messages.success(request, f"Résultat enregistré : {match_obj}")
@@ -643,7 +663,55 @@ def playoff_result(request, pk):
 
 
 def _update_playoff_bracket(match_obj):
-    """Met à jour le bracket des playoffs après un résultat."""
+    """Met à jour le bracket complet après chaque résultat."""
+    
+    # 1. GESTION DES QUARTS -> VERS DEMI-FINALES
+    # Bloc Quart 1 (1er vs 8e) -> Va en Semi 1
+    q1_l1 = PlayoffMatch.objects.filter(round_type='quart_1_leg1', is_played=True).first()
+    q1_l2 = PlayoffMatch.objects.filter(round_type='quart_1_leg2', is_played=True).first()
+    if q1_l1 and q1_l2:
+        w1, _ = _determine_match_winner(q1_l1, q1_l2)
+        if w1:
+            s1_l1 = PlayoffMatch.objects.filter(round_type='semi_1_leg1').first()
+            s1_l2 = PlayoffMatch.objects.filter(round_type='semi_1_leg2').first()
+            if s1_l1: s1_l1.home_team = w1; s1_l1.save()
+            if s1_l2: s1_l2.away_team = w1; s1_l2.save()
+
+    # Bloc Quart 4 (4e vs 5e) -> Va en Semi 1 (Adversaire du vainqueur Q1)
+    q4_l1 = PlayoffMatch.objects.filter(round_type='quart_4_leg1', is_played=True).first()
+    q4_l2 = PlayoffMatch.objects.filter(round_type='quart_4_leg2', is_played=True).first()
+    if q4_l1 and q4_l2:
+        w4, _ = _determine_match_winner(q4_l1, q4_l2)
+        if w4:
+            s1_l1 = PlayoffMatch.objects.filter(round_type='semi_1_leg1').first()
+            s1_l2 = PlayoffMatch.objects.filter(round_type='semi_1_leg2').first()
+            if s1_l1: s1_l1.away_team = w4; s1_l1.save()
+            if s1_l2: s1_l2.home_team = w4; s1_l2.save()
+
+    # Bloc Quart 2 (2e vs 7e) -> Va en Semi 2
+    q2_l1 = PlayoffMatch.objects.filter(round_type='quart_2_leg1', is_played=True).first()
+    q2_l2 = PlayoffMatch.objects.filter(round_type='quart_2_leg2', is_played=True).first()
+    if q2_l1 and q2_l2:
+        w2, _ = _determine_match_winner(q2_l1, q2_l2)
+        if w2:
+            s2_l1 = PlayoffMatch.objects.filter(round_type='semi_2_leg1').first()
+            s2_l2 = PlayoffMatch.objects.filter(round_type='semi_2_leg2').first()
+            if s2_l1: s2_l1.home_team = w2; s2_l1.save()
+            if s2_l2: s2_l2.away_team = w2; s2_l2.save()
+
+    # Bloc Quart 3 (3e vs 6e) -> Va en Semi 2 (Adversaire du vainqueur Q2)
+    q3_l1 = PlayoffMatch.objects.filter(round_type='quart_3_leg1', is_played=True).first()
+    q3_l2 = PlayoffMatch.objects.filter(round_type='quart_3_leg2', is_played=True).first()
+    if q3_l1 and q3_l2:
+        w3, _ = _determine_match_winner(q3_l1, q3_l2)
+        if w3:
+            s2_l1 = PlayoffMatch.objects.filter(round_type='semi_2_leg1').first()
+            s2_l2 = PlayoffMatch.objects.filter(round_type='semi_2_leg2').first()
+            if s2_l1: s2_l1.away_team = w3; s2_l1.save()
+            if s2_l2: s2_l2.home_team = w3; s2_l2.save()
+
+
+    # 2. GESTION DES DEMI-FINALES -> VERS FINALES
     semi_1_leg1 = PlayoffMatch.objects.filter(round_type='semi_1_leg1', is_played=True).first()
     semi_1_leg2 = PlayoffMatch.objects.filter(round_type='semi_1_leg2', is_played=True).first()
     semi_2_leg1 = PlayoffMatch.objects.filter(round_type='semi_2_leg1', is_played=True).first()
@@ -653,13 +721,13 @@ def _update_playoff_bracket(match_obj):
     losers = []
 
     if semi_1_leg1 and semi_1_leg2:
-        winner_1, loser_1 = _determine_semi_winner(semi_1_leg1, semi_1_leg2)
+        winner_1, loser_1 = _determine_match_winner(semi_1_leg1, semi_1_leg2)
         if winner_1:
             finalists.append(winner_1)
             losers.append(loser_1)
 
     if semi_2_leg1 and semi_2_leg2:
-        winner_2, loser_2 = _determine_semi_winner(semi_2_leg1, semi_2_leg2)
+        winner_2, loser_2 = _determine_match_winner(semi_2_leg1, semi_2_leg2)
         if winner_2:
             finalists.append(winner_2)
             losers.append(loser_2)
@@ -679,10 +747,14 @@ def _update_playoff_bracket(match_obj):
             third.save()
 
 
-def _determine_semi_winner(leg1, leg2):
-    """Détermine le gagnant d'une demi-finale aller-retour."""
+def _determine_match_winner(leg1, leg2):
+    """Détermine le gagnant d'une confrontation aller-retour (Quart ou Demi)."""
     team_a = leg1.home_team
     team_b = leg1.away_team
+
+    # Protection si l'un des deux matchs n'a pas encore d'équipes assignées
+    if not team_a or not team_b:
+        return None, None
 
     team_a_total = leg1.home_score + leg2.away_score
     team_b_total = leg1.away_score + leg2.home_score
@@ -692,6 +764,7 @@ def _determine_semi_winner(leg1, leg2):
     elif team_b_total > team_a_total:
         return team_b, team_a
     else:
+        # En cas d'égalité parfaite : tirs au but ou règle des buts à l'extérieur
         if leg2.has_penalties and leg2.penalty_winner:
             winner = leg2.penalty_winner
             loser = team_b if winner == team_a else team_a

@@ -2,280 +2,121 @@
 
 {% block title %}Panel Admin - {{ league_name }}{% endblock %}
 
+{% block extra_css %}
+<style>
+    .admin-title {
+        font-family: 'Orbitron', sans-serif;
+        color: #ff4757;
+        text-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+    }
+    .btn-action {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.2s ease;
+    }
+    .btn-action:hover {
+        transform: translateY(-1px);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>
-        <i class="fas fa-tachometer-alt me-2 text-primary"></i>Panel Administrateur
-    </h2>
-    <span class="badge bg-primary fs-6">
-        <i class="fas fa-user me-1"></i> {{ user.username }}
-    </span>
-</div>
-
-<!-- Cartes statistiques -->
-<div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-        <div class="card bg-dark border-primary stat-card h-100">
-            <div class="card-body text-center">
-                <i class="fas fa-users fa-2x text-primary mb-2"></i>
-                <h3 class="text-primary">{{ total_teams }}</h3>
-                <small class="text-muted">Équipes</small>
-            </div>
+<div class="container py-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h1 class="admin-title h3 text-uppercase mb-1">
+                <i class="fas fa-user-shield me-2"></i>Administration
+            </h1>
+            <p class="text-muted mb-md-0">Gestion de la ligue en cours et encodage des scores.</p>
         </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card bg-dark border-success stat-card h-100">
-            <div class="card-body text-center">
-                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
-                <h3 class="text-success">{{ matches_played }}</h3>
-                <small class="text-muted">Matchs joués</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card bg-dark border-warning stat-card h-100">
-            <div class="card-body text-center">
-                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
-                <h3 class="text-warning">{{ matches_not_played }}</h3>
-                <small class="text-muted">Matchs restants</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card bg-dark border-info stat-card h-100">
-            <div class="card-body text-center">
-                <i class="fas fa-bullseye fa-2x text-info mb-2"></i>
-                <h3 class="text-info">{{ total_goals }}</h3>
-                <small class="text-muted">Total buts</small>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ======================== -->
-<!-- ENREGISTRER DES RÉSULTATS -->
-<!-- ======================== -->
-{% if unplayed_matches %}
-<div class="card bg-dark border-success mb-4">
-    <div class="card-header bg-success bg-opacity-25">
-        <h5 class="mb-0">
-            <i class="fas fa-futbol me-2 text-success"></i>
-            Enregistrer des résultats
-            <span class="badge bg-success ms-2">{{ matches_not_played }} matchs restants</span>
-        </h5>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-dark table-hover mb-0">
-                <thead>
-                    <tr class="text-muted small">
-                        <th>Journée</th>
-                        <th>Phase</th>
-                        <th class="text-end">Domicile</th>
-                        <th class="text-center">VS</th>
-                        <th>Extérieur</th>
-                        <th class="text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for match in unplayed_matches %}
-                        <tr>
-                            <td>
-                                <span class="badge bg-secondary">J{{ match.matchday }}</span>
-                            </td>
-                            <td>
-                                <span class="badge {% if match.phase == 'aller' %}bg-info{% else %}bg-warning text-dark{% endif %}">
-                                    {{ match.get_phase_display }}
-                                </span>
-                            </td>
-                            <td class="text-end">
-                                <strong>{{ match.home_team.name }}</strong>
-                            </td>
-                            <td class="text-center">
-                                <span class="text-muted">VS</span>
-                            </td>
-                            <td>
-                                <strong>{{ match.away_team.name }}</strong>
-                            </td>
-                            <td class="text-center">
-                                <a href="{% url 'league:add_result' match.pk %}"
-                                   class="btn btn-success btn-sm">
-                                    <i class="fas fa-plus me-1"></i> Score
-                                </a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="card-footer bg-transparent text-center">
-        <a href="{% url 'league:match_list' %}?status=pending" class="btn btn-outline-success">
-            <i class="fas fa-list me-1"></i> Voir tous les matchs non joués
-        </a>
-    </div>
-</div>
-{% endif %}
-
-<!-- Actions admin -->
-<div class="row g-4 mb-4">
-    <div class="col-md-6 col-lg-4">
-        <div class="card bg-dark border-primary h-100">
-            <div class="card-header bg-primary bg-opacity-25">
-                <h5 class="mb-0"><i class="fas fa-users me-2"></i>Équipes</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted">Gérer les équipes participantes</p>
-                <div class="d-grid gap-2">
-                    <a href="{% url 'league:team_create' %}" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i> Ajouter une équipe
-                    </a>
-                    <a href="{% url 'league:team_list' %}" class="btn btn-outline-primary">
-                        <i class="fas fa-list me-1"></i> Liste des équipes
-                    </a>
-                </div>
-            </div>
+        <div class="col-md-6 text-md-end">
+            <span class="badge bg-dark border border-secondary p-2 fs-6 text-light">
+                <i class="fas fa-calendar-alt text-info me-2"></i>Saison 2026
+            </span>
         </div>
     </div>
 
-    <div class="col-md-6 col-lg-4">
-        <div class="card bg-dark border-warning h-100">
-            <div class="card-header bg-warning bg-opacity-25">
-                <h5 class="mb-0"><i class="fas fa-calendar me-2"></i>Calendrier</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted">Générer et gérer le calendrier</p>
-                <div class="d-grid gap-2">
-                    <a href="{% url 'league:generate_calendar' %}" class="btn btn-warning text-dark">
-                        <i class="fas fa-magic me-1"></i> Générer calendrier
-                    </a>
-                    <a href="{% url 'league:match_list' %}" class="btn btn-outline-warning">
-                        <i class="fas fa-calendar-alt me-1"></i> Voir calendrier
-                    </a>
-                </div>
+    <div class="row g-4">
+        <!-- Section actions rapides / Formulaire -->
+        <div class="col-lg-4">
+            <div class="custom-card p-4">
+                <h3 class="h5 text-bright border-bottom border-secondary pb-2 mb-3">
+                    <i class="fas fa-plus-circle text-success me-2"></i>Nouveau Match
+                </h3>
+                
+                <!-- Exemple de formulaire pour ajouter un résultat -->
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label text-secondary text-uppercase fs-7 small">Domicile</label>
+                        <select class="form-select bg-dark text-light border-secondary" name="home_player" required>
+                            <option value="" disabled selected>Sélectionner le joueur</option>
+                            {% for standing in standings %}
+                                <option value="{{ standing.player.id }}">{{ standing.player.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-secondary text-uppercase fs-7 small">Extérieur</label>
+                        <select class="form-select bg-dark text-light border-secondary" name="away_player" required>
+                            <option value="" disabled selected>Sélectionner le joueur</option>
+                            {% for standing in standings %}
+                                <option value="{{ standing.player.id }}">{{ standing.player.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col">
+                            <label class="form-label text-secondary text-uppercase fs-7 small">Buts Dom.</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary text-center fs-5" name="home_score" min="0" required>
+                        </div>
+                        <div class="col">
+                            <label class="form-label text-secondary text-uppercase fs-7 small">Buts Ext.</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary text-center fs-5" name="away_score" min="0" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-action w-100">
+                        <i class="fas fa-save me-2"></i>Enregistrer le match
+                    </button>
+                </form>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-6 col-lg-4">
-        <div class="card bg-dark border-success h-100">
-            <div class="card-header bg-success bg-opacity-25">
-                <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Phase Finale</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted">Gérer la phase finale</p>
-                <div class="d-grid gap-2">
-                    <form method="post" action="{% url 'league:generate_playoffs' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-success w-100">
-                            <i class="fas fa-crown me-1"></i> Générer playoffs
-                        </button>
-                    </form>
-                    <a href="{% url 'league:playoffs' %}" class="btn btn-outline-success">
-                        <i class="fas fa-eye me-1"></i> Voir phase finale
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4">
-        <div class="card bg-dark border-info h-100">
-            <div class="card-header bg-info bg-opacity-25">
-                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Statistiques</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted">Voir les stats et classement</p>
-                <div class="d-grid gap-2">
-                    <a href="{% url 'league:standings' %}" class="btn btn-info text-dark">
-                        <i class="fas fa-list-ol me-1"></i> Classement
-                    </a>
-                    <a href="{% url 'league:result_list' %}" class="btn btn-outline-info">
-                        <i class="fas fa-futbol me-1"></i> Résultats
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4">
-        <div class="card bg-dark border-danger h-100">
-            <div class="card-header bg-danger bg-opacity-25">
-                <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>Administrateurs</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted">Gérer les comptes admin</p>
-                <div class="d-grid gap-2">
-                    <a href="{% url 'league:create_admin' %}" class="btn btn-danger">
-                        <i class="fas fa-user-plus me-1"></i> Nouvel admin
-                    </a>
-                    <a href="{% url 'league:manage_admins' %}" class="btn btn-outline-danger">
-                        <i class="fas fa-users-cog me-1"></i> Gérer admins
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-lg-4">
-        <div class="card bg-dark border-secondary h-100">
-            <div class="card-header bg-secondary bg-opacity-25">
-                <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Paramètres</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted">Configuration du compte</p>
-                <div class="d-grid gap-2">
-                    <a href="{% url 'league:change_password' %}" class="btn btn-secondary">
-                        <i class="fas fa-key me-1"></i> Mot de passe
-                    </a>
-                    <a href="/django-admin/" class="btn btn-outline-secondary" target="_blank">
-                        <i class="fas fa-external-link-alt me-1"></i> Django Admin
-                    </a>
+        <!-- Section historique récent de gestion -->
+        <div class="col-lg-8">
+            <div class="custom-card p-4">
+                <h3 class="h5 text-bright border-bottom border-secondary pb-2 mb-3">
+                    <i class="fas fa-history text-info me-2"></i>Derniers Matchs Enregistrés
+                </h3>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle mb-0">
+                        <thead class="table-light text-dark">
+                            <tr class="fs-7 text-uppercase">
+                                <th>Date</th>
+                                <th>Match</th>
+                                <th class="text-center">Score</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Remplacer ceci par votre boucle d'historique de matchs -->
+                            <tr>
+                                <td class="text-muted small">31/05/2026</td>
+                                <td class="fw-semibold">Joueur A vs Joueur B</td>
+                                <td class="text-center fw-bold text-cyan">2 - 1</td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-warning me-1" title="Modifier"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Résultats en attente -->
-{% if pending_results %}
-<div class="card bg-dark border-danger mb-4">
-    <div class="card-header bg-danger bg-opacity-25">
-        <h5 class="mb-0">
-            <i class="fas fa-exclamation-circle me-2 text-danger"></i>
-            Résultats en attente de validation
-            <span class="badge bg-danger ms-2">{{ pending_results|length }}</span>
-        </h5>
-    </div>
-    <div class="card-body p-0">
-        <table class="table table-dark table-hover mb-0">
-            <thead>
-                <tr>
-                    <th>Match</th>
-                    <th class="text-center">Score</th>
-                    <th class="text-center">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for result in pending_results %}
-                    <tr>
-                        <td>{{ result.match }}</td>
-                        <td class="text-center">
-                            <span class="badge bg-primary fs-6">
-                                {{ result.home_score }} - {{ result.away_score }}
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            <a href="{% url 'league:validate_result' result.pk %}"
-                               class="btn btn-sm btn-success">
-                                <i class="fas fa-check me-1"></i> Valider
-                            </a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-{% endif %}
 {% endblock %}

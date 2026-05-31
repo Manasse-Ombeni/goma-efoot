@@ -1,122 +1,102 @@
 {% extends 'league/base.html' %}
 
-{% block title %}Règlement - {{ league_name }}{% endblock %}
+{% block title %}Règlements - Goma eFootball League{% endblock %}
+
+{% block extra_css %}
+<style>
+    .rules-header {
+        font-family: 'Orbitron', sans-serif;
+        border-left: 4px solid var(--neon-cyan);
+        padding-left: 15px;
+    }
+    .rule-number {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--neon-cyan);
+        font-weight: 700;
+        font-size: 1.5rem;
+    }
+    .list-group-item-custom {
+        background-color: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(102, 252, 241, 0.05);
+        border-radius: 6px !important;
+        margin-bottom: 8px;
+        transition: background-color 0.2s ease;
+    }
+    .list-group-item-custom:hover {
+        background-color: rgba(102, 252, 241, 0.05);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <h2 class="mb-4">
-            <i class="fas fa-book me-2 text-primary"></i>Règlement de la Compétition
-        </h2>
+<div class="container py-4" style="max-width: 900px;">
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold text-bright font-orbitron" style="font-family: 'Orbitron', sans-serif;">
+            <i class="fas fa-gavel text-info me-3"></i>CHARTE & RÈGLEMENTS
+        </h1>
+        <p class="text-muted col-lg-8 mx-auto">
+            Afin de garantir le fair-play, la compétitivité et la convivialité au sein de la Goma eFootball League, chaque participant s'engage à respecter les règles suivantes.
+        </p>
+    </div>
 
-        <!-- Règles générales -->
-        <div class="card bg-dark border-primary mb-4">
-            <div class="card-header bg-primary bg-opacity-25">
-                <h4 class="mb-0"><i class="fas fa-gamepad me-2"></i>Règles de Match</h4>
-            </div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush bg-transparent">
-                    <li class="list-group-item bg-transparent text-light border-secondary">
-                        <i class="fas fa-check text-success me-2"></i>
-                        <strong>Type de match :</strong> Match d'amis
-                    </li>
-                    <li class="list-group-item bg-transparent text-light border-secondary">
-                        <i class="fas fa-clock text-info me-2"></i>
-                        <strong>Durée :</strong> 10 minutes
-                    </li>
-                    <li class="list-group-item bg-transparent text-light border-secondary">
-                        <i class="fas fa-sun text-warning me-2"></i>
-                        <strong>Conditions :</strong> Excellente (domicile / extérieur)
-                    </li>
-                    <li class="list-group-item bg-transparent text-light border-secondary">
-                        <i class="fas fa-mobile-alt text-primary me-2"></i>
-                        <strong>Contrôle libre :</strong> Manette ou Tactile
-                    </li>
-                    <li class="list-group-item bg-transparent text-light border-secondary">
-                        <i class="fas fa-user-shield text-danger me-2"></i>
-                        <strong>Validation :</strong> Scores validés par l'administrateur uniquement
-                    </li>
-                </ul>
-            </div>
+    <!-- Règle 1 -->
+    <div class="custom-card p-4 mb-4">
+        <div class="d-flex align-items-center mb-3">
+            <span class="rule-number me-3">01</span>
+            <h3 class="rules-header h4 text-bright mb-0">Paramètres et Configuration des Matchs</h3>
         </div>
-
-        <!-- Système de points -->
-        <div class="card bg-dark border-success mb-4">
-            <div class="card-header bg-success bg-opacity-25">
-                <h4 class="mb-0"><i class="fas fa-calculator me-2"></i>Système de Points</h4>
-            </div>
-            <div class="card-body">
-                <div class="row g-3 text-center">
-                    <div class="col-4">
-                        <div class="card bg-success bg-opacity-25 border-success">
-                            <div class="card-body">
-                                <h2 class="text-success fw-bold">3</h2>
-                                <span class="text-light">Victoire</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="card bg-warning bg-opacity-25 border-warning">
-                            <div class="card-body">
-                                <h2 class="text-warning fw-bold">1</h2>
-                                <span class="text-light">Match nul</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="card bg-danger bg-opacity-25 border-danger">
-                            <div class="card-body">
-                                <h2 class="text-danger fw-bold">0</h2>
-                                <span class="text-light">Défaite</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="card-body text-light-50 p-0">
+            <ul class="list-group bg-transparent border-0">
+                <li class="list-group-item list-group-item-custom text-light d-flex align-items-start">
+                    <i class="fas fa-clock text-info mt-1 me-3"></i>
+                    <div><strong>Durée du match :</strong> Les confrontations se jouent en 10 minutes (5 minutes par mi-temps).</div>
+                </li>
+                <li class="list-group-item list-group-item-custom text-light d-flex align-items-start">
+                    <i class="fas fa-sliders-h text-info mt-1 me-3"></i>
+                    <div><strong>État de forme :</strong> Les conditions physiques des joueurs doivent être réglées sur "Neutre" ou "Aléatoire" selon le consensus de la ligue.</div>
+                </li>
+                <li class="list-group-item list-group-item-custom text-light d-flex align-items-start">
+                    <i class="fas fa-cloud-moon text-info mt-1 me-3"></i>
+                    <div><strong>Stade & Climat :</strong> Environnement standard sans avantage climatique provoqué de manière unilatérale.</div>
+                </li>
+            </ul>
         </div>
+    </div>
 
-        <!-- Format compétition -->
-        <div class="card bg-dark border-warning mb-4">
-            <div class="card-header bg-warning bg-opacity-25">
-                <h4 class="mb-0"><i class="fas fa-sitemap me-2"></i>Format de la Compétition</h4>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <h6 class="text-primary"><i class="fas fa-list me-1"></i> Phase de Groupes</h6>
-                        <ul class="text-light">
-                            <li>Championnat aller-retour</li>
-                            <li>Tous contre tous</li>
-                            <li>Classement par points</li>
-                            <li>Top 4 qualifiés pour la phase finale</li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <h6 class="text-warning"><i class="fas fa-crown me-1"></i> Phase Finale</h6>
-                        <ul class="text-light">
-                            <li>Demi-finales aller-retour</li>
-                            <li>1er vs 4ème / 2ème vs 3ème</li>
-                            <li>Match de 3ème place</li>
-                            <li>Grande Finale</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+    <!-- Règle 2 -->
+    <div class="custom-card p-4 mb-4">
+        <div class="d-flex align-items-center mb-3">
+            <span class="rule-number me-3">02</span>
+            <h3 class="rules-header h4 text-bright mb-0">Comportement, Déconnexions & Fair-Play</h3>
         </div>
+        <div class="card-body p-0">
+            <ul class="list-group bg-transparent border-0">
+                <li class="list-group-item list-group-item-custom text-light d-flex align-items-start">
+                    <i class="fas fa-wifi text-danger mt-1 me-3"></i>
+                    <div><strong>Ragequit & Déconnexion volontaire :</strong> Tout abandon volontaire en plein match est sanctionné par un forfait automatique de 3-0 en faveur de l'adversaire.</div>
+                </li>
+                <li class="list-group-item list-group-item-custom text-light d-flex align-items-start">
+                    <i class="fas fa-hands-helping text-success mt-1 me-3"></i>
+                    <div><strong>Respect mutuel :</strong> Les insultes, provocations déplacées ou comportements toxiques dans le chat ou lors des rencontres physiques sont passibles de sanctions allant du retrait de points à l'exclusion définitive.</div>
+                </li>
+            </ul>
+        </div>
+    </div>
 
-        <!-- Critères de départage -->
-        <div class="card bg-dark border-info mb-4">
-            <div class="card-header bg-info bg-opacity-25">
-                <h4 class="mb-0"><i class="fas fa-balance-scale me-2"></i>Critères de Départage</h4>
-            </div>
-            <div class="card-body">
-                <ol class="text-light">
-                    <li class="mb-2">Nombre de <strong class="text-primary">points</strong></li>
-                    <li class="mb-2"><strong class="text-info">Différence de buts</strong> générale</li>
-                    <li class="mb-2">Nombre de <strong class="text-success">buts marqués</strong></li>
-                </ol>
+    <!-- Règle 3 -->
+    <div class="custom-card p-4 mb-4">
+        <div class="d-flex align-items-center mb-3">
+            <span class="rule-number me-3">03</span>
+            <h3 class="rules-header h4 text-bright mb-0">Validation des Résultats</h3>
+        </div>
+        <div class="card-body p-0">
+            <p class="mb-3">Pour qu'un résultat soit pris en compte par les administrateurs de la ligue :</p>
+            <div class="alert bg-dark border border-secondary text-light p-3">
+                <i class="fas fa-camera text-warning me-2"></i>
+                Chaque joueur doit effectuer une <strong>capture d'écran lisible</strong> du score final à la fin du match et l'envoyer directement au panel de gestion ou via le canal officiel de la compétition. En cas de litige sans preuve visuelle, le match sera rejoué.
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}

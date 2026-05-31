@@ -290,9 +290,17 @@ class Standing(models.Model):
 class PlayoffMatch(models.Model):
     """
     Modèle Match de Phase Finale.
-    Gère les demi-finales, match 3e place et finale.
+    Gère les quarts de finale, demi-finales, match 3e place et finale.
     """
     ROUND_CHOICES = [
+        ('quart_1_leg1', 'Quart de finale 1 - Aller'),
+        ('quart_1_leg2', 'Quart de finale 1 - Retour'),
+        ('quart_2_leg1', 'Quart de finale 2 - Aller'),
+        ('quart_2_leg2', 'Quart de finale 2 - Retour'),
+        ('quart_3_leg1', 'Quart de finale 3 - Aller'),
+        ('quart_3_leg2', 'Quart de finale 3 - Retour'),
+        ('quart_4_leg1', 'Quart de finale 4 - Aller'),
+        ('quart_4_leg2', 'Quart de finale 4 - Retour'),
         ('semi_1_leg1', 'Demi-finale 1 - Aller'),
         ('semi_1_leg2', 'Demi-finale 1 - Retour'),
         ('semi_2_leg1', 'Demi-finale 2 - Aller'),
@@ -358,7 +366,8 @@ class PlayoffMatch(models.Model):
     class Meta:
         verbose_name = "Match Phase Finale"
         verbose_name_plural = "Matchs Phase Finale"
-        ordering = ['round_type']
+        # Suppression de ordering=['round_type'] pour trier proprement selon l'ordre logique de la compétition
+        ordering = ['created_at'] 
 
     def __str__(self):
         home = self.home_team or "TBD"

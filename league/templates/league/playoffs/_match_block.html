@@ -1,0 +1,38 @@
+<div class="p-3 mb-2 rounded bg-dark border border-secondary">
+    <small class="text-muted d-block mb-2">{{ match.get_round_type_display }}</small>
+    <div class="row align-items-center text-center">
+        <div class="col-4 text-truncate">
+            <strong class="{% if is_single and match.round_type == 'final' %}text-warning{% endif %}">
+                {{ match.home_team.name|default:"TBD" }}
+            </strong>
+        </div>
+        <div class="col-4">
+            {% if match.is_played %}
+                <span class="badge bg-{{ btn_color }} {% if is_single and match.round_type == 'final' %}fs-5 px-3 py-2 text-dark{% else %}fs-6 px-3{% endif %}">
+                    {{ match.home_score }} - {{ match.away_score }}
+                </span>
+                {% if match.has_penalties %}
+                    <br><small class="text-warning fw-bold">TAB</small>
+                {% elif match.has_extra_time %}
+                    <br><small class="text-info">AP</small>
+                {% endif %}
+            {% else %}
+                <span class="badge bg-secondary">VS</span>
+            {% endif %}
+        </div>
+        <div class="col-4 text-truncate">
+            <strong class="{% if is_single and match.round_type == 'final' %}text-warning{% endif %}">
+                {{ match.away_team.name|default:"TBD" }}
+            </strong>
+        </div>
+    </div>
+    {% if user.is_authenticated and user.is_staff and match.home_team and match.away_team %}
+        <div class="text-center mt-2">
+            <a href="{% url 'league:playoff_result' match.pk %}"
+               class="btn btn-sm btn-outline-{{ btn_color }}">
+                <i class="fas fa-edit me-1"></i>
+                {% if match.is_played %}Modifier{% else %}Score{% endif %}
+            </a>
+        </div>
+    {% endif %}
+</div>

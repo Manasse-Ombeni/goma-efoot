@@ -1,209 +1,210 @@
-{% load static %}
-{% load league_tags %}
 <!DOCTYPE html>
-<html lang="fr" data-bs-theme="dark">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ league_name }}{% endblock %}</title>
-
+    <title>{% block title %}Goma eFootball League{% endblock %}</title>
+    <!-- Google Fonts : Inter pour un rendu propre, pro et moderne -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome pour les icônes d'origine -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-          rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <!-- CSS personnalisé -->
-    <link href="{% static 'league/css/style.css' %}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --dark-nav-bg: #0d1117; /* Fond sombre de la navbar d'origine */
+            --body-bg: #090d13;
+            --text-muted: #8b949e;
+            --text-light: #f0f6fc;
+            --btn-blue: #0066cc;
+            --btn-green: #1f883d;
+        }
+
+        body {
+            background-color: var(--body-bg);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            padding-top: 75px;
+        }
+
+        /* Navbar fidèle à l'image image_6c7c01.png */
+        .navbar {
+            background-color: var(--dark-nav-bg) !important;
+            border-bottom: 1px solid #21262d;
+            padding: 0.75rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #ffffff !important;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-badge {
+            background-color: #0062ff;
+            color: white;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .nav-link {
+            color: var(--text-muted) !important;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.5rem 0.8rem !important;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff !important;
+        }
+
+        .nav-link.active {
+            position: relative;
+        }
+        /* Petite barre bleue sous l'onglet actif comme sur l'image */
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #0052cc;
+        }
+
+        /* Bouton Groupe WhatsApp */
+        .btn-whatsapp {
+            background-color: #198754;
+            color: white !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 6px 16px;
+            border-radius: 8px;
+            border: none;
+            transition: background-color 0.2s;
+        }
+        .btn-whatsapp:hover {
+            background-color: #157347;
+        }
+
+        /* Menu déroulant Utilisateur / efootball */
+        .user-dropdown .btn-user {
+            background-color: transparent;
+            border: 1px solid #30363d;
+            color: #58a6ff !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 6px 16px;
+            border-radius: 8px;
+        }
+        .user-dropdown .btn-user:hover {
+            background-color: #21262d;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- ======================== -->
-    <!-- NAVBAR -->
-    <!-- ======================== -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-primary fixed-top">
-        <div class="container-fluid">
-            <!-- Logo et titre -->
-            <a class="navbar-brand d-flex align-items-center" href="{% url 'league:home' %}">
-                <i class="fas fa-gamepad text-primary me-2 fa-lg"></i>
-                <span class="brand-text">GOMA-Efootball</span>
-                <span class="badge bg-primary ms-2 d-none d-md-inline">League</span>
-            </a>
 
-            <!-- Bouton hamburger mobile -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav" aria-controls="navbarNav"
-                    aria-expanded="false" aria-label="Toggle navigation">
+    <!-- Barre de navigation d'origine restaurée -->
+    <nav class="navbar navbar-expand-xl navbar-dark fixed-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="{% url 'league:home' %}">
+                <i class="fas fa-gamepad text-primary me-2"></i>GOMA-EFOOTBALL <span class="brand-badge">League</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
-            <!-- Menu -->
+            
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+                <!-- Liens de navigation centraux -->
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
-                           href="{% url 'league:home' %}">
-                            <i class="fas fa-home me-1"></i> Accueil
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'league:home' %}">
+                            <i class="fas fa-home"></i> Accueil
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if 'team' in request.resolver_match.url_name %}active{% endif %}"
-                           href="{% url 'league:team_list' %}">
-                            <i class="fas fa-users me-1"></i> Équipes
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-users"></i> Équipes
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'match_list' %}active{% endif %}"
-                           href="{% url 'league:match_list' %}">
-                            <i class="fas fa-calendar-alt me-1"></i> Calendrier
+                        <a class="nav-link" href="#">
+                            <i class="far fa-calendar-alt"></i> Calendrier
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'result_list' %}active{% endif %}"
-                           href="{% url 'league:result_list' %}">
-                            <i class="fas fa-futbol me-1"></i> Résultats
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-circle-dot"></i> Résultats
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'standings' %}active{% endif %}"
-                           href="{% url 'league:standings' %}">
-                            <i class="fas fa-trophy me-1"></i> Classement
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-trophy"></i> Classement
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'playoffs' %}active{% endif %}"
-                           href="{% url 'league:playoffs' %}">
-                            <i class="fas fa-crown me-1"></i> Phase Finale
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-crown"></i> Phase Finale
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'rules' %}active{% endif %}"
-                           href="{% url 'league:rules' %}">
-                            <i class="fas fa-book me-1"></i> Règlement
+                        <a class="nav-link {% if request.resolver_match.url_name == 'rules' %}active{% endif %}" href="{% url 'league:rules' %}">
+                            <i class="fas fa-book"></i> Règlement
                         </a>
                     </li>
                 </ul>
 
-                <!-- Boutons droite -->
-                <div class="d-flex align-items-center">
-                    <!-- WhatsApp -->
-                    <a href="{{ whatsapp_link }}" target="_blank"
-                       class="btn btn-success btn-sm me-2" title="Rejoindre le groupe WhatsApp">
-                        <i class="fab fa-whatsapp me-1"></i>
-                        <span class="d-none d-md-inline">Groupe WhatsApp</span>
+                <!-- Boutons d'action à droite (WhatsApp et Profil) -->
+                <div class="d-flex align-items-center gap-3">
+                    <a href="https://chat.whatsapp.com/..." target="_blank" class="btn btn-whatsapp d-flex align-items-center gap-2">
+                        <i class="fab fa-whatsapp"></i> Groupe WhatsApp
                     </a>
-
-                    {% if user.is_authenticated and user.is_staff %}
-                        <!-- Menu Admin -->
-                        <div class="dropdown">
-                            <button class="btn btn-outline-primary btn-sm dropdown-toggle"
-                                    type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-shield me-1"></i>
-                                {{ user.username }}
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'league:admin_dashboard' %}">
-                                        <i class="fas fa-tachometer-alt me-2"></i> Panel Admin
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'league:change_password' %}">
-                                        <i class="fas fa-key me-2"></i> Changer mot de passe
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item text-danger" href="{% url 'league:logout' %}">
-                                        <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    {% else %}
-                        <a href="{% url 'league:login' %}" class="btn btn-outline-light btn-sm">
-                            <i class="fas fa-sign-in-alt me-1"></i> Admin
-                        </a>
-                    {% endif %}
+                    
+                    <div class="dropdown user-dropdown">
+                        <button class="btn btn-user dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-shield"></i> efootball
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                            <li><a class="dropdown-menu-item dropdown-item" href="{% url 'league:admin_dashboard' %}">Panel Admin</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Déconnexion</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- ======================== -->
-    <!-- MESSAGES FLASH -->
-    <!-- ======================== -->
-    <div class="container-fluid" style="margin-top: 70px;">
+    <!-- Zone principale de contenu -->
+    <main class="container py-4">
         {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-2"
-                     role="alert">
-                    {% if message.tags == 'success' %}
-                        <i class="fas fa-check-circle me-2"></i>
-                    {% elif message.tags == 'error' %}
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                    {% elif message.tags == 'warning' %}
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                    {% else %}
-                        <i class="fas fa-info-circle me-2"></i>
-                    {% endif %}
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
+            <div class="container p-0 mb-4">
+                {% for message in messages %}
+                    <div class="alert alert-dark border-secondary text-light alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
         {% endif %}
-    </div>
 
-    <!-- ======================== -->
-    <!-- CONTENU PRINCIPAL -->
-    <!-- ======================== -->
-    <main class="container-fluid py-3">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- ======================== -->
-    <!-- FOOTER -->
-    <!-- ======================== -->
-    <footer class="bg-dark border-top border-secondary py-4 mt-5">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
-                    <h5 class="text-primary mb-1">
-                        <i class="fas fa-gamepad me-2"></i>GOMA-Efootball League
-                    </h5>
-                    <small class="text-muted">La compétition esport de Goma</small>
-                </div>
-                <div class="col-md-4 text-center mb-3 mb-md-0">
-                    <a href="{{ whatsapp_link }}" target="_blank"
-                       class="btn btn-success btn-sm">
-                        <i class="fab fa-whatsapp me-1"></i> Rejoindre le groupe
-                    </a>
-                </div>
-                <div class="col-md-4 text-center text-md-end">
-                    <small class="text-muted">
-                        &copy; 2024 GOMA-Efootball League. Tous droits réservés.
-                    </small>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- ======================== -->
-    <!-- WhatsApp Floating Button -->
-    <!-- ======================== -->
-    <a href="{{ whatsapp_link }}" target="_blank"
-       class="whatsapp-float" title="Rejoindre le groupe WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- JS personnalisé -->
-    <script src="{% static 'league/js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

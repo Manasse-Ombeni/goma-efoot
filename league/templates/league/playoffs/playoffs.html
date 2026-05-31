@@ -6,36 +6,35 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>
-        <i class="fas fa-crown me-2 text-warning"></i>Phase Finale
+        <i class="fas fa-crown me-2 text-warning"></i>Phase Finale (TOP 8)
     </h2>
     {% if user.is_authenticated and user.is_staff and not has_playoffs %}
         <form method="post" action="{% url 'league:generate_playoffs' %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-warning">
-                <i class="fas fa-magic me-1"></i> Générer la phase finale
+                <i class="fas fa-magic me-1"></i> Générer la phase finale (Quarts)
             </button>
         </form>
     {% endif %}
 </div>
 
-<!-- Top 4 qualifiés -->
-{% if top_4 %}
+{% if top_8 %}
 <div class="card bg-dark border-warning mb-4">
     <div class="card-header bg-warning bg-opacity-25">
         <h5 class="mb-0">
-            <i class="fas fa-star me-2 text-warning"></i>Équipes qualifiées
+            <i class="fas fa-star me-2 text-warning"></i>Les 8 Équipes Qualifiées
         </h5>
     </div>
     <div class="card-body">
         <div class="row g-3 text-center">
-            {% for standing in top_4 %}
-                <div class="col-6 col-md-3">
-                    <div class="card bg-dark border-{% if forloop.counter == 1 %}warning{% elif forloop.counter == 2 %}secondary{% elif forloop.counter == 3 %}danger{% else %}success{% endif %}">
-                        <div class="card-body py-3">
-                            <span class="badge {{ standing.position|get_badge_class }} mb-2">
-                                {{ standing.position }}{% if standing.position == 1 %}er{% else %}ème{% endif %}
+            {% for standing in top_8 %}
+                <div class="col-6 col-sm-4 col-md-3">
+                    <div class="card bg-dark border-secondary">
+                        <div class="card-body py-2">
+                            <span class="badge bg-secondary mb-1">
+                                {{ forloop.counter }}{% if forloop.counter == 1 %}er{% else %}ème{% endif %}
                             </span>
-                            <h6 class="text-light">{{ standing.team.name }}</h6>
+                            <h6 class="text-light mb-0 text-truncate">{{ standing.team.name }}</h6>
                             <small class="text-muted">{{ standing.points }} pts</small>
                         </div>
                     </div>
@@ -47,199 +46,133 @@
 {% endif %}
 
 {% if has_playoffs %}
-<!-- Bracket des playoffs -->
+<h3 class="text-warning mb-3 mt-4"><i class="fas fa-trophy me-2"></i>Quarts de Finale</h3>
+<div class="row g-4 mb-5">
+    <div class="col-md-6 col-lg-3">
+        <div class="card bg-dark border-info h-100">
+            <div class="card-header bg-info bg-opacity-10 py-2">
+                <h6 class="mb-0 text-info">Quart de finale 1</h6>
+                <small class="text-muted">1er vs 8e</small>
+            </div>
+            <div class="card-body p-2">
+                {% for match in quart_1 %}
+                    {% include "league/playoffs/_match_block.html" with match=match btn_color="info" %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card bg-dark border-info h-100">
+            <div class="card-header bg-info bg-opacity-10 py-2">
+                <h6 class="mb-0 text-info">Quart de finale 2</h6>
+                <small class="text-muted">2e vs 7e</small>
+            </div>
+            <div class="card-body p-2">
+                {%     for match in quart_2 %}
+                    {% include "league/playoffs/_match_block.html" with match=match btn_color="info" %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card bg-dark border-info h-100">
+            <div class="card-header bg-info bg-opacity-10 py-2">
+                <h6 class="mb-0 text-info">Quart de finale 3</h6>
+                <small class="text-muted">3e vs 6e</small>
+            </div>
+            <div class="card-body p-2">
+                {% for match in quart_3 %}
+                    {% include "league/playoffs/_match_block.html" with match=match btn_color="info" %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card bg-dark border-info h-100">
+            <div class="card-header bg-info bg-opacity-10 py-2">
+                <h6 class="mb-0 text-info">Quart de finale 4</h6>
+                <small class="text-muted">4e vs 5e</small>
+            </div>
+            <div class="card-body p-2">
+                {% for match in quart_4 %}
+                    {% include "league/playoffs/_match_block.html" with match=match btn_color="info" %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="border-secondary my-5">
+
 <div class="row g-4">
-    <!-- Demi-finales -->
     <div class="col-lg-6">
-        <div class="card bg-dark border-primary mb-3">
+        <div class="card bg-dark border-primary mb-4">
             <div class="card-header bg-primary bg-opacity-25">
                 <h5 class="mb-0"><i class="fas fa-layer-group me-2"></i>Demi-finale 1</h5>
-                <small class="text-muted">1er vs 4ème</small>
+                <small class="text-muted">Vainqueur Quart 1 vs Vainqueur Quart 4</small>
             </div>
             <div class="card-body">
                 {% for match in semi_1 %}
-                    <div class="p-3 mb-2 rounded bg-dark border border-secondary">
-                        <small class="text-muted d-block mb-2">{{ match.get_round_type_display }}</small>
-                        <div class="row align-items-center text-center">
-                            <div class="col-4">
-                                <strong>{{ match.home_team.name|default:"TBD" }}</strong>
-                            </div>
-                            <div class="col-4">
-                                {% if match.is_played %}
-                                    <span class="badge bg-primary fs-6 px-3">
-                                        {{ match.home_score }} - {{ match.away_score }}
-                                    </span>
-                                    {% if match.has_penalties %}
-                                        <br><small class="text-warning">TAB</small>
-                                    {% elif match.has_extra_time %}
-                                        <br><small class="text-info">AP</small>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="badge bg-secondary">VS</span>
-                                {% endif %}
-                            </div>
-                            <div class="col-4">
-                                <strong>{{ match.away_team.name|default:"TBD" }}</strong>
-                            </div>
-                        </div>
-                        {% if user.is_authenticated and user.is_staff and match.home_team and match.away_team %}
-                            <div class="text-center mt-2">
-                                <a href="{% url 'league:playoff_result' match.pk %}"
-                                   class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-edit me-1"></i>
-                                    {% if match.is_played %}Modifier{% else %}Score{% endif %}
-                                </a>
-                            </div>
-                        {% endif %}
-                    </div>
+                    {% include "league/playoffs/_match_block.html" with match=match btn_color="primary" %}
                 {% endfor %}
             </div>
         </div>
-    </div>
 
-    <div class="col-lg-6">
         <div class="card bg-dark border-primary mb-3">
             <div class="card-header bg-primary bg-opacity-25">
                 <h5 class="mb-0"><i class="fas fa-layer-group me-2"></i>Demi-finale 2</h5>
-                <small class="text-muted">2ème vs 3ème</small>
+                <small class="text-muted">Vainqueur Quart 2 vs Vainqueur Quart 3</small>
             </div>
             <div class="card-body">
                 {% for match in semi_2 %}
-                    <div class="p-3 mb-2 rounded bg-dark border border-secondary">
-                        <small class="text-muted d-block mb-2">{{ match.get_round_type_display }}</small>
-                        <div class="row align-items-center text-center">
-                            <div class="col-4">
-                                <strong>{{ match.home_team.name|default:"TBD" }}</strong>
-                            </div>
-                            <div class="col-4">
-                                {% if match.is_played %}
-                                    <span class="badge bg-primary fs-6 px-3">
-                                        {{ match.home_score }} - {{ match.away_score }}
-                                    </span>
-                                    {% if match.has_penalties %}
-                                        <br><small class="text-warning">TAB</small>
-                                    {% elif match.has_extra_time %}
-                                        <br><small class="text-info">AP</small>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="badge bg-secondary">VS</span>
-                                {% endif %}
-                            </div>
-                            <div class="col-4">
-                                <strong>{{ match.away_team.name|default:"TBD" }}</strong>
-                            </div>
-                        </div>
-                        {% if user.is_authenticated and user.is_staff and match.home_team and match.away_team %}
-                            <div class="text-center mt-2">
-                                <a href="{% url 'league:playoff_result' match.pk %}"
-                                   class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-edit me-1"></i>
-                                    {% if match.is_played %}Modifier{% else %}Score{% endif %}
-                                </a>
-                            </div>
-                        {% endif %}
-                    </div>
+                    {% include "league/playoffs/_match_block.html" with match=match btn_color="primary" %}
                 {% endfor %}
             </div>
         </div>
     </div>
 
-    <!-- Match 3e place -->
     <div class="col-lg-6">
-        <div class="card bg-dark border-danger">
+        <div class="card bg-dark border-danger mb-4">
             <div class="card-header bg-danger bg-opacity-25">
                 <h5 class="mb-0"><i class="fas fa-medal me-2 text-danger"></i>Match 3ème place</h5>
             </div>
             <div class="card-body">
                 {% if third_place %}
-                    <div class="p-3 rounded bg-dark border border-secondary text-center">
-                        <div class="row align-items-center">
-                            <div class="col-4">
-                                <strong>{{ third_place.home_team.name|default:"En attente" }}</strong>
-                            </div>
-                            <div class="col-4">
-                                {% if third_place.is_played %}
-                                    <span class="badge bg-danger fs-6 px-3">
-                                        {{ third_place.home_score }} - {{ third_place.away_score }}
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-secondary">VS</span>
-                                {% endif %}
-                            </div>
-                            <div class="col-4">
-                                <strong>{{ third_place.away_team.name|default:"En attente" }}</strong>
-                            </div>
-                        </div>
-                        {% if user.is_authenticated and user.is_staff and third_place.home_team and third_place.away_team %}
-                            <a href="{% url 'league:playoff_result' third_place.pk %}"
-                               class="btn btn-sm btn-outline-danger mt-2">
-                                <i class="fas fa-edit me-1"></i> Score
-                            </a>
-                        {% endif %}
-                    </div>
+                    {% include "league/playoffs/_match_block.html" with match=third_place btn_color="danger" is_single=True %}
                 {% endif %}
             </div>
         </div>
-    </div>
 
-    <!-- Finale -->
-    <div class="col-lg-6">
         <div class="card bg-dark border-warning">
             <div class="card-header bg-warning bg-opacity-25">
                 <h5 class="mb-0"><i class="fas fa-crown me-2 text-warning"></i>FINALE</h5>
             </div>
             <div class="card-body">
                 {% if final %}
-                    <div class="p-3 rounded bg-dark border border-warning text-center">
-                        <div class="row align-items-center">
-                            <div class="col-4">
-                                <strong class="text-warning">
-                                    {{ final.home_team.name|default:"En attente" }}
-                                </strong>
-                            </div>
-                            <div class="col-4">
-                                {% if final.is_played %}
-                                    <span class="badge bg-warning text-dark fs-5 px-3 py-2">
-                                        {{ final.home_score }} - {{ final.away_score }}
-                                    </span>
-                                    {% if final.has_penalties %}
-                                        <br><small class="text-warning">Tirs au but</small>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="badge bg-warning text-dark fs-5 px-3 py-2">VS</span>
-                                {% endif %}
-                            </div>
-                            <div class="col-4">
-                                <strong class="text-warning">
-                                    {{ final.away_team.name|default:"En attente" }}
-                                </strong>
-                            </div>
+                    {% include "league/playoffs/_match_block.html" with match=final btn_color="warning" is_single=True %}
+                    
+                    {% if final.is_played and final.winner %}
+                        <div class="text-center mt-4">
+                            <i class="fas fa-trophy fa-3x text-warning"></i>
+                            <h3 class="text-warning mt-2">🏆 {{ final.winner.name }} 🏆</h3>
+                            <p class="text-muted text-uppercase fw-bold">Champion GOMA-Efootball League</p>
                         </div>
-                        {% if final.is_played and final.winner %}
-                            <div class="mt-3">
-                                <i class="fas fa-trophy fa-2x text-warning"></i>
-                                <h4 class="text-warning mt-2">🏆 {{ final.winner.name }} 🏆</h4>
-                                <p class="text-muted">Champion GOMA-Efootball League</p>
-                            </div>
-                        {% endif %}
-                        {% if user.is_authenticated and user.is_staff and final.home_team and final.away_team %}
-                            <a href="{% url 'league:playoff_result' final.pk %}"
-                               class="btn btn-sm btn-outline-warning mt-2">
-                                <i class="fas fa-edit me-1"></i> Score
-                            </a>
-                        {% endif %}
-                    </div>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
+
 {% else %}
     <div class="text-center py-5">
         <i class="fas fa-crown fa-4x text-muted mb-3"></i>
         <h4 class="text-muted">Phase finale non encore générée</h4>
         <p class="text-muted">
-            La phase finale sera disponible une fois que tous les matchs de la phase régulière seront terminés.
+            La phase finale (TOP 8) sera disponible une fois que tous les matchs de la phase régulière seront terminés.
         </p>
     </div>
 {% endif %}
